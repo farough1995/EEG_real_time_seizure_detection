@@ -130,7 +130,7 @@ parser.add_argument('--dev-bckg-num', type=int, default=10)
 parser.add_argument('--get-model-summary', type=bool, default=False, help="print model summary before training")
 
 # others
-parser.add_argument('--ignore_model_speed', type=bool, default=False)
+parser.add_argument('--ignore_model_speed', type=bool, default=True)
 
 #####################
 args = parser.parse_args()

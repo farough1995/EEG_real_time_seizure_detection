@@ -113,7 +113,7 @@ for name in names:
 
                 print(f'Time taken to iterate once :    {(iteration_end-iteration_start)} seconds')
                 print(f'Time taken per window slide :    {(iteration_end-iteration_start)/num_windows} seconds')
-                exit(1)
+                # exit(1)
 
     # print(f'Time taken to iterate once :    {(iteration_end-iteration_start)} seconds')
     # print(f'Time taken per window slide :    {(iteration_end-iteration_start)/num_windows} seconds')
