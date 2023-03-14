@@ -229,8 +229,8 @@ def get_data_preprocessed(args, mode="train"):
    
     print("Preparing data for bianry detector...")
     train_data_path = args.data_path + "/dataset-tuh_task-binary_datatype-train_v6"
-    # dev_data_path = args.data_path + "/dataset-tuh_task-binary_datatype-dev_v6"
-    dev_data_path = args.data_path + "/dataset-tuh_task-binary_noslice_datatype-dev_v6"
+    dev_data_path = args.data_path + "/dataset-tuh_task-binary_datatype-dev_v6"
+    # dev_data_path = args.data_path + "/dataset-tuh_task-binary_noslice_datatype-dev_v6"
     train_dir = search_walk({"path": train_data_path, "extension": ".pkl"})
     dev_dir = search_walk({"path": dev_data_path, "extension": ".pkl"})
     random.shuffle(train_dir)
@@ -241,53 +241,53 @@ def get_data_preprocessed(args, mode="train"):
         train_dir += train_dir
         aug_train = ["1"] * len(train_dir)
 
-    # # get one spsz and one tnsz from training data to dev data in order to distribute at least one seizure type to each group
-    # patid_to_transfer = ["00008527", "00009044"]
-    # for pkl1 in train_dir:
-    #     type1, type2 = pkl1.split("_")[-2:]
-    #     pat_id = (pkl1.split("/")[-1]).split("_")[0]
-    #     if pat_id in patid_to_transfer:
-    #         dev_dir.append(pkl1)
-    #         train_dir.remove(pkl1)
-    #     if type1 == "8":
-    #         train_dir.remove(pkl1)
-    # # Validation data and Test data patient separation
-    # pat_info = {}
-    # val_dict = {}
-    # test_dict = {}
-    # val_dir = []
-    # test_dir = []
-    # for pkl2 in dev_dir:
-    #     type1, type2 = pkl2.split("_")[-2:]
-    #     pat_id = (pkl2.split("/")[-1]).split("_")[0]
-    #     if pat_id not in pat_info:
-    #         pat_info[pat_id] = [[],[],[]]
-    #     pat_info[pat_id][2].append(pkl2)
-    #     pat_info[pat_id][0].append(type1)
-    #     pat_info[pat_id][1].append(type2)
-    # for pat_id in pat_info:
-    #     pat_info[pat_id][0] = list(set(pat_info[pat_id][0]))
-    #     pat_info[pat_id][1] = list(set(pat_info[pat_id][1]))
+    # get one spsz and one tnsz from training data to dev data in order to distribute at least one seizure type to each group
+    patid_to_transfer = ["00008527", "00009044"]
+    for pkl1 in train_dir:
+        type1, type2 = pkl1.split("_")[-2:]
+        pat_id = (pkl1.split("/")[-1]).split("_")[0]
+        if pat_id in patid_to_transfer:
+            dev_dir.append(pkl1)
+            train_dir.remove(pkl1)
+        if type1 == "8":
+            train_dir.remove(pkl1)
+    # Validation data and Test data patient separation
+    pat_info = {}
+    val_dict = {}
+    test_dict = {}
+    val_dir = []
+    test_dir = []
+    for pkl2 in dev_dir:
+        type1, type2 = pkl2.split("_")[-2:]
+        pat_id = (pkl2.split("/")[-1]).split("_")[0]
+        if pat_id not in pat_info:
+            pat_info[pat_id] = [[],[],[]]
+        pat_info[pat_id][2].append(pkl2)
+        pat_info[pat_id][0].append(type1)
+        pat_info[pat_id][1].append(type2)
+    for pat_id in pat_info:
+        pat_info[pat_id][0] = list(set(pat_info[pat_id][0]))
+        pat_info[pat_id][1] = list(set(pat_info[pat_id][1]))
 
-    # val_list = ["00008527", "00008460", "00004671", "00009578", "00010062", "00009697", "00004087", "00006986", "00002289", "00010022", "00005479", "00009866", "00001640", "00005625", "00008889", "00010639", "00009842", "00010106", "00004594", "00000675", "00002297", "00005031", "00010547", "00008174", "00000795"]
-    # test_list = ["00009044", "00006546", "00001981", "00009839", "00009570", "00008544", "00008453", "00007633", "00003306", "00005943", "00008479", "00008512", "00006059", "00010861", "00001770", "00001027", "00000629", "00000258", "00001278", "00003281", "00003635", "00005213", "00008550", "00006900", "00004151", "00001984"]
-    # # val_list = ["00008460", "00004671", "00009578", "00010062", "00009697", "00004087", "00006986", "00002289", "00010022", "00005479", "00009866", "00001640", "00005625", "00008889", "00010639", "00009842", "00010106", "00004594", "00000675", "00002297", "00005031", "00010547", "00008174", "00000795"]
-    # # test_list = ["00006546", "00001981", "00009839", "00009570", "00008544", "00008453", "00007633", "00003306", "00005943", "00008479", "00008512", "00006059", "00010861", "00001770", "00001027", "00000629", "00000258", "00001278", "00003281", "00003635", "00005213", "00008550", "00006900", "00004151", "00001984"]
-    # for i in val_list:
-    #     val_dict[i] = pat_info[i]
-    # for i in test_list:
-    #     test_dict[i] = pat_info[i]
-    # # print(" ")
-    # # for i in val_dict:
-    # #     print("{}: {}".format(str(i), val_dict[i]))
-    # # print(" ")
-    # # for i in test_dict:
-    # #     print("{}: {}".format(str(i), test_dict[i]))
-    # # exit(1)
+    val_list = ["00008527", "00008460", "00004671", "00009578", "00010062", "00009697", "00004087", "00006986", "00002289", "00010022", "00005479", "00009866", "00001640", "00005625", "00008889", "00010639", "00009842", "00010106", "00004594", "00000675", "00002297", "00005031", "00010547", "00008174", "00000795"]
+    test_list = ["00009044", "00006546", "00001981", "00009839", "00009570", "00008544", "00008453", "00007633", "00003306", "00005943", "00008479", "00008512", "00006059", "00010861", "00001770", "00001027", "00000629", "00000258", "00001278", "00003281", "00003635", "00005213", "00008550", "00006900", "00004151", "00001984"]
+    # val_list = ["00008460", "00004671", "00009578", "00010062", "00009697", "00004087", "00006986", "00002289", "00010022", "00005479", "00009866", "00001640", "00005625", "00008889", "00010639", "00009842", "00010106", "00004594", "00000675", "00002297", "00005031", "00010547", "00008174", "00000795"]
+    # test_list = ["00006546", "00001981", "00009839", "00009570", "00008544", "00008453", "00007633", "00003306", "00005943", "00008479", "00008512", "00006059", "00010861", "00001770", "00001027", "00000629", "00000258", "00001278", "00003281", "00003635", "00005213", "00008550", "00006900", "00004151", "00001984"]
+    for i in val_list:
+        val_dict[i] = pat_info[i]
+    for i in test_list:
+        test_dict[i] = pat_info[i]
+    # print(" ")
     # for i in val_dict:
-    #     val_dir += val_dict[i][2]
+    #     print("{}: {}".format(str(i), val_dict[i]))
+    # print(" ")
     # for i in test_dict:
-    #     test_dir += test_dict[i][2]
+    #     print("{}: {}".format(str(i), test_dict[i]))
+    # exit(1)
+    for i in val_dict:
+        val_dir += val_dict[i][2]
+    for i in test_dict:
+        test_dir += test_dict[i][2]
 
     half_dev_num = int(len(dev_dir) // 2)
     val_dir = dev_dir[:half_dev_num] 

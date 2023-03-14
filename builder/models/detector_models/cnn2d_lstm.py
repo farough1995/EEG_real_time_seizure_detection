@@ -162,10 +162,10 @@ class CNN2D_LSTM_V8(nn.Module):
                         x = x.reshape(x.size(0), -1, x.size(3)).unsqueeze(1)
                 else:
                         x = x.unsqueeze(1)
-                print(x.shape)
+                #print(x.shape)
                 x = self.features(x)
-                print(x.shape)
-                exit(1)
+                #print(x.shape)
+                #exit(1)
                 x = self.agvpool(x)
                 x = torch.squeeze(x, 2)
                 x = x.permute(0, 2, 1)
