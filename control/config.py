@@ -129,6 +129,10 @@ parser.add_argument('--dev-bckg-num', type=int, default=10)
 
 parser.add_argument('--get-model-summary', type=bool, default=False, help="print model summary before training")
 
+# others
+parser.add_argument('--ignore_model_speed', type=bool, default=False)
+
+#####################
 args = parser.parse_args()
 args.cnn_channel_sizes = [args.sincnet_bandnum, 10, 10]
 
