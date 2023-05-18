@@ -63,6 +63,7 @@ class Logger:
         self.val_loss = 0
         self.best_auc = 0
         self.best_iter = 0
+        self.best_epoch = 0
         self.best_result_so_far = np.array([])
         self.best_results = []
 
@@ -86,11 +87,11 @@ class Logger:
     def log_val_loss(self, val_step, step):
         self.writer.add_scalar('val/loss', self.val_loss / val_step, global_step=step)
 
-    def add_validation_logs(self, step):
+    def add_validation_logs(self, epoch, step):
         if self.args.task_type == "binary":
             result, tpr, fnr, tnr, fpr = self.evaluator.performance_metric_binary()
             auc = result[0]
-            os.system("echo  \'##### Current Validation results #####\'")
+            os.system("echo  \'##### Current Validation results in Epoch:{} iter:{}  #####\'".format(str(epoch), str(step)))
             os.system("echo  \'auc: {}, apr: {}, f1_score: {}\'".format(str(result[0]), str(result[1]), str(result[2])))
             os.system("echo  \'tpr: {}, fnr: {}, tnr: {}, fpr: {}\'".format(str(tpr), str(fnr), str(tnr), str(fpr)))
 
@@ -104,11 +105,12 @@ class Logger:
 
             if self.best_auc < auc:
                 self.best_iter = step
+                self.best_epoch = epoch
                 self.best_auc = auc
                 self.best_result_so_far = result
                 self.best_results = [tpr, fnr, tnr, fpr]
 
-            os.system("echo  \'##### Best Validation results in history #####\'")
+            os.system("echo  \'##### Best Validation results in history Epoch:{} iter:{}  #####\'".format(str(self.best_epoch), str(self.best_iter)))
             os.system("echo  \'auc: {}, apr: {}, f1_score: {}\'".format(str(self.best_result_so_far[0]), str(self.best_result_so_far[1]), str(self.best_result_so_far[2])))
             os.system("echo  \'tpr: {}, fnr: {}, tnr: {}, fpr: {}\'".format(str(self.best_results[0]), str(self.best_results[1]), str(self.best_results[2]), str(self.best_results[3])))
 

@@ -121,6 +121,7 @@ def sliding_window_v1(args, iteration, train_x, train_y, seq_lengths, target_len
 
         logits, maps = model(seq_slice)
         # print("maps: ", maps)
+        # print(model)
         # exit(1)
         logits = logits.type(torch.FloatTensor)
         

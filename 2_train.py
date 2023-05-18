@@ -143,13 +143,13 @@ for seed_num in args.seed_list:
                         val_iteration += 1
                     
                     logger.log_val_loss(val_iteration, iteration)
-                    logger.add_validation_logs(iteration)
+                    logger.add_validation_logs(epoch,iteration)
                     logger.save(model, optimizer, iteration, epoch)
                 model.train()
         pbar.update(1)
 
-    logger.val_result_only()
-    save_valid_results.results_all_seeds(logger.test_results)
+    # logger.val_result_only()
+    # save_valid_results.results_all_seeds(logger.test_results)
     
     # get model checkpoint - end of train step
     # initalize model (again)
@@ -164,12 +164,12 @@ for seed_num in args.seed_list:
     logger = Logger(args)
     # load model checkpoint  
     if args.last:
-        ckpt_path = args.dir_result + '/' + args.project_name + '/ckpts/last.pth'
+        ckpt_path = args.dir_result + '/' + args.project_name + '/ckpts/last_{}.pth'.format(str(seed_num))
     elif args.best:
-        ckpt_path = args.dir_result + '/' + args.project_name + '/ckpts/best.pth'
+        ckpt_path = args.dir_result + '/' + args.project_name + '/ckpts/best_{}.pth'.format(str(seed_num))
 
     if not os.path.exists(ckpt_path):
-        print("Final model for test experiment doesn't exist...")
+        print("Final model for test experiment doesn't exist...",ckpt_path)
         exit(1)
     # load model & state
     ckpt    = torch.load(ckpt_path, map_location=device)

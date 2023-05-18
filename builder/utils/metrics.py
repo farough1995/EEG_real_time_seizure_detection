@@ -153,11 +153,12 @@ class Evaluator(object):
                 fnr_seiz = 1 - tpr_seiz 
                 tnr_seiz = 1 - fpr_seiz
                 best_threshold_seiz = np.argmax(tpr_seiz + tnr_seiz)
-                print("Seizure:{} - auc:{} apr:{} tpr:{} tnr:{}".format(self.args.seizure_to_num_inv[str(q+1)], str(auc), str(apr), str(tpr_seiz[best_threshold_seiz]), str(tnr_seiz[best_threshold_seiz])))
-                self.seizurewise_list[q][0]=auc
-                self.seizurewise_list[q][1]=apr
-                self.seizurewise_list[q][2]=tpr_seiz[best_threshold_seiz]
-                self.seizurewise_list[q][3]=tnr_seiz[best_threshold_seiz]
+                if str(q+1) in self.args.seizure_to_num_inv:
+                    print("Seizure:{} - auc:{} apr:{} tpr:{} tnr:{}".format(self.args.seizure_to_num_inv[str(q+1)], str(auc), str(apr), str(tpr_seiz[best_threshold_seiz]), str(tnr_seiz[best_threshold_seiz])))
+                    self.seizurewise_list[q][0]=auc
+                    self.seizurewise_list[q][1]=apr
+                    self.seizurewise_list[q][2]=tpr_seiz[best_threshold_seiz]
+                    self.seizurewise_list[q][3]=tnr_seiz[best_threshold_seiz]
 
         if self.args.margin_test:
             target_stack = torch.stack(self.final_target_list)
