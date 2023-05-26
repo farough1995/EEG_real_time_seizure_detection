@@ -19,9 +19,9 @@ from builder.models.feature_extractor.spectrogram_feature_binary import *
 from builder.models.feature_extractor.sincnet_feature import SINCNET_FEATURE
 from builder.models.feature_extractor.lfcc_feature import LFCC_FEATURE
 
-class CNN2D_LSTM_V8(nn.Module):
+class CNN2D_LSTM(nn.Module):
         def __init__(self, args, device):
-                super(CNN2D_LSTM_V8, self).__init__()      
+                super(CNN2D_LSTM, self).__init__()      
                 self.args = args
 
                 self.num_layers = args.num_layers

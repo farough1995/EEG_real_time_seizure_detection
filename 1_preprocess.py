@@ -418,7 +418,10 @@ def generate_training_data_leadwise_tuh_train_final(file):
     print(f"patient_wise_dir: {patient_wise_dir}")
     print(f'GLOBAL_DATA["label_type"]: {GLOBAL_DATA["label_type"]}')
     edf_list = search_walk(
-        {"path": patient_wise_dir, "extension": f'.{GLOBAL_DATA["label_type"]}'}# added: extension->.extension
+        {
+            "path": patient_wise_dir,
+            "extension": f'.{GLOBAL_DATA["label_type"]}',
+        }  # added: extension->.extension
     )
     print(f"edf_list: {edf_list}")
     patient_bool = False
@@ -1010,6 +1013,8 @@ def main(args):
 
     target_dictionary = {0: 0}
     selected_diseases = []
+    # args.disease_type = args.disease_type.split(",")
+    # print(args.disease_type)
     label_exception = list(
         set(args.disease_type)
         - set(
@@ -1109,7 +1114,13 @@ if __name__ == "__main__":
     )
 
     ##### Target Grouping #####
-    parser.add_argument("--disease_type", type=str, nargs="+")
+    # parser.add_argument("--disease_type", type=str, nargs="+")
+    parser.add_argument(
+        "--disease_type",
+        type=list,
+        default=["gnsz", "fnsz", "spsz", "cpsz", "absz", "tnsz", "tcsz", "mysz"],
+        choices=["gnsz", "fnsz", "spsz", "cpsz", "absz", "tnsz", "tcsz", "mysz"],
+    )
 
     ### for binary detector ###
     # key numbers represent index of --disease_type + 1  ### -1 is "not being used"

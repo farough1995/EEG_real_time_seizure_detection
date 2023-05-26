@@ -5,9 +5,9 @@ import torch
 import torch.nn as nn
 from torch.autograd import Variable
 
-class RESNET18_CONV1D_V1(nn.Module):
+class RESNET18_CONV1D(nn.Module):
     def __init__(self, args, device):
-        super(RESNET18_CONV1D_V1, self).__init__()
+        super(RESNET18_CONV1D, self).__init__()
         self.args = args
 
         self.num_channel = self.args.num_channel

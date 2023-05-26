@@ -18,9 +18,9 @@ from builder.models.feature_extractor.psd_feature import *
 from builder.models.feature_extractor.spectrogram_feature_binary import *
 from builder.models.feature_extractor.sincnet_feature import SINCNET_FEATURE
 
-class CNN2D_BLSTM_V8(nn.Module):
+class CNN2D_BLSTM(nn.Module):
         def __init__(self, args, device):
-                super(CNN2D_BLSTM_V8, self).__init__()      
+                super(CNN2D_BLSTM, self).__init__()      
                 self.args = args
                 
                 self.num_layers = args.num_layers
