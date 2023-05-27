@@ -25,9 +25,9 @@ import torch.nn.init as init
 from builder.models.src.transformer.module import PositionalEncoding
 
 
-class EEG_FEATURE_TRANSFORMER_V15(nn.Module):
+class EEG_FEATURE_TRANSFORMER(nn.Module):
     def __init__(self, args, device):
-        super(EEG_FEATURE_TRANSFORMER_V15, self).__init__()      
+        super(EEG_FEATURE_TRANSFORMER, self).__init__()      
         self.args = args
 
         self.num_layers = args.num_layers

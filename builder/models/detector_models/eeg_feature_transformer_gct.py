@@ -1,4 +1,4 @@
-# Copyright (c) 2022, Kwanhyung Lee, AITRICS. All rights reserved.
+# Copyright (c) 2022, Kwanhyung Lee. All rights reserved.
 #
 # Licensed under the MIT License;
 # you may not use this file except in compliance with the License.
@@ -8,6 +8,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import numpy as np
 import torch.nn.functional as F
 import torch
@@ -24,9 +25,9 @@ import torch.nn.init as init
 from builder.models.src.transformer.module import PositionalEncoding
 
 
-class EEG_FEATURE_TRANSFORMER_UNIPOLAR(nn.Module):
+class EEG_FEATURE_TRANSFORMER_GCT(nn.Module):
     def __init__(self, args, device):
-        super(EEG_FEATURE_TRANSFORMER_UNIPOLAR, self).__init__()
+        super(EEG_FEATURE_TRANSFORMER_GCT, self).__init__()
         self.args = args
 
         self.num_layers = args.num_layers
@@ -116,6 +117,30 @@ class EEG_FEATURE_TRANSFORMER_UNIPOLAR(nn.Module):
                 conv2d_bn(128, 256, (1, 13), 1, (0, 6)),
                 conv2d_bn(256, 256, (1, 7), 1, (0, 3)),
             )
+        block_mask = torch.tensor(
+            [
+                [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+                [0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+                [1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+                [0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+                [0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0],
+                [0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 1, 0, 0],
+                [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0],
+                [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1],
+                [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0],
+                [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
+            ]
+        )
 
         self.transformer_encoder = TransformerEncoder(
             d_input=transformer_d_input,
@@ -126,26 +151,25 @@ class EEG_FEATURE_TRANSFORMER_UNIPOLAR(nn.Module):
             dropout=0.1,
             pe_maxlen=500,
             use_pe=False,
-            block_mask=None,
+            block_mask=block_mask.to(device),
         )
         self.agvpool = nn.AdaptiveAvgPool1d(1)
 
         self.hidden = (
-            torch.zeros(1, args.batch_size, 19).to(device),
-            torch.zeros(1, args.batch_size, 19).to(device),
+            torch.zeros(1, args.batch_size, 20).to(device),
+            torch.zeros(1, args.batch_size, 20).to(device),
         )
 
         self.positional_encoding = PositionalEncoding(256, max_len=10)
         self.pe_x = self.positional_encoding(6).to(device)
 
         self.lstm = nn.LSTM(
-            input_size=19, hidden_size=19, num_layers=1, batch_first=True
+            input_size=20, hidden_size=20, num_layers=1, batch_first=True
         )
 
         self.classifier = nn.Sequential(
-            nn.Linear(in_features=19, out_features=args.output_dim, bias=True),
+            nn.Linear(in_features=20, out_features=args.output_dim, bias=True),
         )
-        self.getattnmap = args.map
 
     def forward(self, x):
         x = x.permute(0, 2, 1)
@@ -158,16 +182,16 @@ class EEG_FEATURE_TRANSFORMER_UNIPOLAR(nn.Module):
         x = self.features(x).permute(0, 2, 3, 1)
 
         x = x + self.pe_x.unsqueeze(0)
-        x = x.reshape(x.size(0), 19, -1)
-        x, maps = self.transformer_encoder(x, return_attns=self.getattnmap)
+        x = x.reshape(x.size(0), 20, -1)
+        x = self.transformer_encoder(x)
         x = self.agvpool(x)
         self.hidden = tuple(([Variable(var.data) for var in self.hidden]))
         output, self.hidden = self.lstm(x.permute(0, 2, 1), self.hidden)
         output = self.classifier(output.squeeze(1))
-        return output, maps
+        return output, self.hidden
 
     def init_state(self, device):
         self.hidden = (
-            torch.zeros(1, self.args.batch_size, 19).to(device),
-            torch.zeros(1, self.args.batch_size, 19).to(device),
+            torch.zeros(1, self.args.batch_size, 20).to(device),
+            torch.zeros(1, self.args.batch_size, 20).to(device),
         )

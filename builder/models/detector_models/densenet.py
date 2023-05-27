@@ -101,9 +101,9 @@ class Transition(nn.Module):
         return out
 
 
-class DENSENET_V3(nn.Module):
+class DENSENET(nn.Module):
     def __init__(self, args, device):
-        super(DENSENET_V3, self).__init__()
+        super(DENSENET, self).__init__()
         self.args = args
 
         self.enc_model = self.args.enc_model
