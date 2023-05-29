@@ -1114,13 +1114,19 @@ if __name__ == "__main__":
     )
 
     ##### Target Grouping #####
-    # parser.add_argument("--disease_type", type=str, nargs="+")
     parser.add_argument(
         "--disease_type",
-        type=list,
+        type=str,
+        nargs="*",
         default=["gnsz", "fnsz", "spsz", "cpsz", "absz", "tnsz", "tcsz", "mysz"],
-        choices=["gnsz", "fnsz", "spsz", "cpsz", "absz", "tnsz", "tcsz", "mysz"],
+        choices=["gnsz", "fnsz", "spsz", "cpsz", "absz", "tnsz", "tcsz", "mysz", "seiz"],
     )
+    # parser.add_argument(
+    #     "--disease_type",
+    #     type=list,
+    #     default=["gnsz", "fnsz", "spsz", "cpsz", "absz", "tnsz", "tcsz", "mysz"],
+    #     choices=["gnsz", "fnsz", "spsz", "cpsz", "absz", "tnsz", "tcsz", "mysz"],
+    # )
 
     ### for binary detector ###
     # key numbers represent index of --disease_type + 1  ### -1 is "not being used"

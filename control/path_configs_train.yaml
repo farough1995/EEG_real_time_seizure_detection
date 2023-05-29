@@ -1,6 +1,0 @@
-data_directory: 
-    data_path: /home/s2140401/experiment/bda/tuh/AITRICS/preprocessing/csv50
-dir_result: /home/s2140401/experiment/bda/tuh/AITRICS/result/csv50
-data_directory: 
-    data_path: /home/s2140401/data/brain/edf
-dir_result: /home/s2140401/experiment/bda/tuh/AITRICS/preprocessing/csv50
