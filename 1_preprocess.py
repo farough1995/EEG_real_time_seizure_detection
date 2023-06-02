@@ -17,6 +17,7 @@ from scipy import signal as sci_sig
 from scipy.spatial.distance import pdist
 from scipy.signal import stft, hilbert, butter, freqz, filtfilt, find_peaks
 from builder.utils.process_util import run_multi_process
+from builder.utils.threads_util import run_multi_threads
 from builder.utils.utils import search_walk
 import numpy as np
 import matplotlib.pyplot as plt
@@ -415,12 +416,15 @@ def generate_training_data_leadwise_tuh_train_final(file):
     # check if seizure patient or non-seizure patient
     patient_wise_dir = "/".join(file_name.split("/")[:-2])
     # patient_id = file_name.split("/")[-3] # unused
-    print(f"patient_wise_dir: {patient_wise_dir}")
-    print(f'GLOBAL_DATA["label_type"]: {GLOBAL_DATA["label_type"]}')
+    # print(f"patient_wise_dir: {patient_wise_dir}")
+    # print(f'GLOBAL_DATA["label_type"]: {GLOBAL_DATA["label_type"]}')
     edf_list = search_walk(
-        {"path": patient_wise_dir, "extension": f'.{GLOBAL_DATA["label_type"]}'}# added: extension->.extension
+        {
+            "path": patient_wise_dir,
+            "extension": f'.{GLOBAL_DATA["label_type"]}',
+        }  # added: extension->.extension
     )
-    print(f"edf_list: {edf_list}")
+    # print(f"edf_list: {edf_list}")
     patient_bool = False
     for tse_bi_file in edf_list:
         label_file = open(
@@ -964,8 +968,9 @@ def main(args):
         "tse",
         "tse_bi",
         "csv_bi",
+        "csv"
     ), "Label type should be one of (tse, tse_bi, csv_bi), given {label_type}"
-    if label_type == "tse":
+    if label_type == "tse" or "csv":
         disease_labels = {
             "bckg": 0,
             "cpsz": 1,
@@ -1010,6 +1015,8 @@ def main(args):
 
     target_dictionary = {0: 0}
     selected_diseases = []
+    # args.disease_type = args.disease_type.split(",")
+    # print(args.disease_type)
     label_exception = list(
         set(args.disease_type)
         - set(
@@ -1055,13 +1062,19 @@ def main(args):
     print("################ Preprocess begins... ################\n")
 
     if (task_type == "binary") and (args.data_type == "train"):
-        run_multi_process(
+        run_multi_threads(
             generate_training_data_leadwise_tuh_train_final,
             edf_list,
             n_processes=cpu_num,
         )
     elif (task_type == "binary") and (args.data_type == "dev"):
-        run_multi_process(
+        run_multi_threads(
+            generate_training_data_leadwise_tuh_train_final,
+            edf_list,
+            n_processes=cpu_num,
+        )
+    elif (task_type == "binary") and (args.data_type == "eval"):
+        run_multi_threads(
             generate_training_data_leadwise_tuh_train_final,
             edf_list,
             n_processes=cpu_num,
@@ -1098,7 +1111,7 @@ if __name__ == "__main__":
     )
     parser.add_argument("--dataset", "-st", type=str, default="tuh", choices=["tuh"])
     parser.add_argument(
-        "--data_type", "-dt", type=str, default="train", choices=["train", "dev"]
+        "--data_type", "-dt", type=str, default="train", choices=["train", "dev", "eval"]
     )
     parser.add_argument(
         "--task_type",
@@ -1109,7 +1122,19 @@ if __name__ == "__main__":
     )
 
     ##### Target Grouping #####
-    parser.add_argument("--disease_type", type=str, nargs="+")
+    parser.add_argument(
+        "--disease_type",
+        type=str,
+        nargs="*",
+        default=["gnsz", "fnsz", "spsz", "cpsz", "absz", "tnsz", "tcsz", "mysz"],
+        choices=["gnsz", "fnsz", "spsz", "cpsz", "absz", "tnsz", "tcsz", "mysz", "seiz"],
+    )
+    # parser.add_argument(
+    #     "--disease_type",
+    #     type=list,
+    #     default=["gnsz", "fnsz", "spsz", "cpsz", "absz", "tnsz", "tcsz", "mysz"],
+    #     choices=["gnsz", "fnsz", "spsz", "cpsz", "absz", "tnsz", "tcsz", "mysz"],
+    # )
 
     ### for binary detector ###
     # key numbers represent index of --disease_type + 1  ### -1 is "not being used"
@@ -1131,7 +1156,7 @@ if __name__ == "__main__":
         "--path_to_eeg",
         "-p2e",
         type=str,
-        default="path/to/eeg",
+        default="/home/farough/Downloads/TUSZv2.0.0/edf",
         help="Path to TUH corpus",
     )
 

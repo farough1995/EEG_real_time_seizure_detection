@@ -4,7 +4,7 @@ numpy
 pandas
 matplotlib
 mne
-sklearn
+scikit-learn
 pyyaml
 openpyxl
 tqdm
@@ -16,3 +16,4 @@ grad-cam
 opencv-python
 ttach
 hyperopt
+torchinfo

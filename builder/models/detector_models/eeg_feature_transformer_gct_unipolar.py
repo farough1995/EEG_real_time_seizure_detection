@@ -24,9 +24,9 @@ import torch.nn.init as init
 from builder.models.src.transformer.module import PositionalEncoding
 
 
-class EEG_FEATURE_TRANSFORMER_UNIPOLAR(nn.Module):
+class EEG_FEATURE_TRANSFORMER_GCT_UNIPOLAR(nn.Module):
     def __init__(self, args, device):
-        super(EEG_FEATURE_TRANSFORMER_UNIPOLAR, self).__init__()
+        super(EEG_FEATURE_TRANSFORMER_GCT_UNIPOLAR, self).__init__()
         self.args = args
 
         self.num_layers = args.num_layers
@@ -116,6 +116,29 @@ class EEG_FEATURE_TRANSFORMER_UNIPOLAR(nn.Module):
                 conv2d_bn(128, 256, (1, 13), 1, (0, 6)),
                 conv2d_bn(256, 256, (1, 7), 1, (0, 3)),
             )
+        block_mask = torch.tensor(
+            [
+                [1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+                [1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+                [1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+                [0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1],
+                [1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 0, 0, 1, 0, 1, 1],
+                [0, 0, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1],
+                [0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1],
+                [0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0],
+                [0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0],
+                [0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
+                [0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0],
+                [0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0],
+                [0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1, 0],
+                [1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            ]
+        )
 
         self.transformer_encoder = TransformerEncoder(
             d_input=transformer_d_input,
@@ -126,7 +149,7 @@ class EEG_FEATURE_TRANSFORMER_UNIPOLAR(nn.Module):
             dropout=0.1,
             pe_maxlen=500,
             use_pe=False,
-            block_mask=None,
+            block_mask=block_mask.to(device),
         )
         self.agvpool = nn.AdaptiveAvgPool1d(1)
 
