@@ -466,10 +466,18 @@ def generate_training_data_leadwise_tuh_train_final(file):
 
     for lead_signal in GLOBAL_DATA["label_list"]:
         signal_final_list_raw.append(signal_list[signal_label_list.index(lead_signal)])
+    
+    # print(f"signal_final_list_raw_0 : \n{signal_final_list_raw[0]}")
+    # print(f"len signal_final_list_raw_0 : \n{len(signal_final_list_raw[0])}")
+    # print(f"feature_sample_rate : \n{GLOBAL_DATA['feature_sample_rate']}")
+    # print(f"sample_rate : \n{GLOBAL_DATA['sample_rate']}")
+    
 
-    new_length = len(signal_final_list_raw[0]) * (
-        float(GLOBAL_DATA["feature_sample_rate"]) / GLOBAL_DATA["sample_rate"]
+    new_length = int(len(signal_final_list_raw[0]) * (
+        float(GLOBAL_DATA["feature_sample_rate"]) / GLOBAL_DATA["sample_rate"])
     )
+    
+    # print(f"new_length : \n{new_length}")
 
     if len(y_sampled) > new_length:
         y_sampled = y_sampled[:new_length]
@@ -477,6 +485,7 @@ def generate_training_data_leadwise_tuh_train_final(file):
         diff = int(new_length - len(y_sampled))
         y_sampled += y_sampled[-1] * diff
 
+    # print(f"y_sampled : \n{y_sampled}")
     y_sampled_np = np.array(list(map(int, y_sampled)))
     # new_labels = [] # unused
     # new_labels_idxs = [] # unused
@@ -496,8 +505,9 @@ def generate_training_data_leadwise_tuh_train_final(file):
 
     # slice and save if training data
     new_data = {}
-    raw_data = torch.Tensor(signal_final_list_raw).permute(1, 0)
-    raw_data = raw_data.type(torch.float16)
+    raw_data = np.array(signal_final_list_raw)
+    raw_data = torch.tensor(raw_data,dtype=torch.float16).permute(1, 0)
+    # raw_data = raw_data.type(torch.float16)
 
     min_seg_len_label = (
         GLOBAL_DATA["min_binary_slicelength"] * GLOBAL_DATA["feature_sample_rate"]
@@ -1156,7 +1166,7 @@ if __name__ == "__main__":
         "--path_to_eeg",
         "-p2e",
         type=str,
-        default="/home/farough/Downloads/TUSZv2.0.0/edf",
+        default="/media/farough/Carla_ext1/TSZv2.0.0/edf",
         help="Path to TUH corpus",
     )
 
